@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace DirSize
 {
-    static class DDirHelper
+    static class DSDirHelper
     {
-        static public string printDDir(DDir dir)
+        static public string printDDir(DSDir dir)
         {
             string outstr = "";
             List<string> print_inner = printDDir_inner(dir);
@@ -19,7 +19,7 @@ namespace DirSize
 
         const string delim = "\t";
 
-        static List<string> printDDir_inner(DDir dir)
+        static List<string> printDDir_inner(DSDir dir)
         {
             List<string> retval = new List<string>();
             retval.Add("<folder " + dir.path + " - " + getrepr(dir.size)+ ">");
@@ -64,29 +64,29 @@ namespace DirSize
         }
     }
 
-    class DDir
+    class DSDir
     {
         public string path;
-        public List<DDir> subdirs;
-        public List<FFile> files;
+        public List<DSDir> subdirs;
+        public List<DSFile> files;
         public long size;
 
-        public DDir(string path)
+        public DSDir(string path)
         {
             System.Diagnostics.Debug.WriteLine("scanning: " + path);
-            subdirs = new List<DDir>();
-            files = new List<FFile>();
+            subdirs = new List<DSDir>();
+            files = new List<DSFile>();
             this.path = path;
 
             string[] subdirs_list = Directory.GetDirectories(path);
             string[] files_list = Directory.GetFiles(path);
             foreach (var f in files_list)
             {
-                this.files.Add(new FFile(f));
+                this.files.Add(new DSFile(f));
             }
             foreach (var sd in subdirs_list)
             {
-                this.subdirs.Add(new DDir(sd));
+                this.subdirs.Add(new DSDir(sd));
             }
 
             size = 0;
@@ -101,12 +101,12 @@ namespace DirSize
         }
     }
 
-    class FFile
+    class DSFile
     {
         public string path;
         public long size;
 
-        public FFile(string path)
+        public DSFile(string path)
         {
             this.path = path;
             this.size = new FileInfo(path).Length;
