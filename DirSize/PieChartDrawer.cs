@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 namespace DirSize
 {
@@ -10,11 +12,19 @@ namespace DirSize
     {
         public static Color[] StandardColors = { Color.Red, Color.Green, Color.Blue, Color.Purple, Color.Cyan, Color.Yellow};
         public static Color OtherColor = Color.Black;
-        public static Color FilesColor = Color.LightGray;
-        public static int ChartBorder = 3;
+        public static Color FilesColor = Color.Gray;
+        public static int ChartBorder = 5;
+        public static Color ChartBorderColor = Color.LightGray;
+        public static float ChartSizeRatio = 0.8f;
 
-        public static void DrawChart(Graphics gfx, int x, int y, int radius, DSDir directory)
+        public static void DrawChart(Control control, DSDir directory)
         {
+            Graphics gfx = control.CreateGraphics();
+            int minDimension = control.Width > control.Height ? control.Height : control.Width;
+            int radius = (int)((minDimension - 2 * ChartBorder) * ChartSizeRatio / 2);
+            int x = control.Width / 2, y = control.Height / 2;
+
+            //sizes to be drawn
             List<DSDir> subdirs = directory.subdirs;
             long allSubdirsSize = 0;
             foreach (DSDir subdir in subdirs)
@@ -25,6 +35,19 @@ namespace DirSize
 
             subdirs.Sort(new DSDirComparer());
             
+            //drawing background
+            gfx.FillRectangle(
+                new HatchBrush(HatchStyle.WideDownwardDiagonal, Color.LightGray, Color.White),
+                new Rectangle(Point.Empty, control.Size));
+            gfx.FillEllipse(
+                new SolidBrush(ChartBorderColor),
+                new Rectangle(
+                    x - radius - ChartBorder,
+                    y - radius - ChartBorder,
+                    2 * (radius + ChartBorder),
+                    2 * (radius + ChartBorder)));
+
+            //drawing subdirs
             Rectangle targetRect = new Rectangle(x-radius, y-radius, 2*radius, 2*radius);
             long remainingSubdirsSize = allSubdirsSize;
             int i = 0;
@@ -47,6 +70,33 @@ namespace DirSize
 
             gfx.FillPie(new SolidBrush(FilesColor), targetRect, startAngle, 360 - startAngle);
         }
+
+        public static DSDir GetDirUnderCursor(Control control, DSDir directory, Point location)
+        {
+            if (directory == null || directory.subdirs.Count == 0)
+                return null;
+
+            int cx = control.Width / 2, cy = control.Height / 2;
+            int dx = location.X - cx, dy = location.Y - cy;
+            double phi = Math.Atan2(dy, dx);
+            if (phi < 0)
+                phi += Math.PI * 2;
+            double r = Math.Sqrt(dx * dx + dy * dy);
+            int minDimension = control.Width > control.Height ? control.Height : control.Width;
+            int radius = (int)((minDimension - 2 * ChartBorder) * ChartSizeRatio / 2);
+            if (r > radius)
+                return null;
+
+            double ratio = phi / (Math.PI * 2);
+            long start = 0;
+            for (int i = 0; i < directory.subdirs.Count; i++)
+            {
+                start += directory.subdirs[i].size;
+                if (1.0 * start / directory.size > ratio)
+                    return directory.subdirs[i];
+            }
+            return null;
+        }        
 
         public class DSDirComparer : IComparer<DSDir>
         {

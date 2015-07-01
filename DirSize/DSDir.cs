@@ -6,7 +6,7 @@ namespace DirSize
 {
     static class DSDirHelper
     {
-        static public string printDDir(DSDir dir)
+        static public string printDSDir(DSDir dir)
         {
             string outstr = "";
             List<string> print_inner = printDDir_inner(dir);
@@ -35,7 +35,7 @@ namespace DirSize
             return retval;
         }
 
-        static string getrepr(long size)
+        public static string getrepr(long size)
         {
             double sz = size;
             int order = 0;
@@ -67,16 +67,18 @@ namespace DirSize
     class DSDir
     {
         public string path;
+        public DSDir parent;
         public List<DSDir> subdirs;
         public List<DSFile> files;
         public long size;
 
-        public DSDir(string path)
+        public DSDir(string path, DSDir parent = null)
         {
             System.Diagnostics.Debug.WriteLine("scanning: " + path);
             subdirs = new List<DSDir>();
             files = new List<DSFile>();
             this.path = path;
+            this.parent = parent;
 
             string[] subdirs_list = Directory.GetDirectories(path);
             string[] files_list = Directory.GetFiles(path);
@@ -86,7 +88,7 @@ namespace DirSize
             }
             foreach (var sd in subdirs_list)
             {
-                this.subdirs.Add(new DSDir(sd));
+                this.subdirs.Add(new DSDir(sd, this));
             }
 
             size = 0;
