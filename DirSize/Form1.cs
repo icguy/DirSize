@@ -24,15 +24,16 @@ namespace DirSize
         //-legend
 
         private void Form1_Load(object sender, EventArgs e)
-        {            
+        {
             //string path = @"D:\Dokumentumok";
             //DSDir root = new DSDir(path);
             //System.Diagnostics.Debug.WriteLine(DDirHelper.printDDir(root));
-            button1_Click(null, null);
         }
 
-        DSDir currentDirectory;
-        DSDir rootDirectory;
+        DSDir CurrentDirectory_;
+        DSDir RootDirectory_;
+        PieChartDrawer ChartDrawer_;
+
         private void button1_Click(object sender, EventArgs e)
         {
 #if !DEBUG
@@ -42,18 +43,22 @@ namespace DirSize
 
             rootDirectory = new DSDir(fbd.SelectedPath);
 #else
-            rootDirectory = new DSDir("D:/Asztal/temp");
+            RootDirectory_ = new DSDir("D:/Asztal/temp");
 #endif
-            currentDirectory = rootDirectory;
-            System.Diagnostics.Debug.WriteLine(DSDirHelper.printDSDir(currentDirectory));
+            ChartDrawer_ = new PieChartDrawer(RootDirectory_);
+            CurrentDirectory_ = RootDirectory_;
+            System.Diagnostics.Debug.WriteLine(DSDirHelper.printDSDir(CurrentDirectory_));
 
-            PieChartDrawer.DrawChart(panel1, currentDirectory);
-            PieChartDrawer.DrawLegend(panel2, currentDirectory);
+            ChartDrawer_.DrawChart(panel1);
+            ChartDrawer_.DrawLegend(panel2);
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
-            DSDir dirundercursor = PieChartDrawer.GetDirUnderCursor(panel1, currentDirectory, e.Location);
+            if (CurrentDirectory_ == null)
+                return;
+
+            DSDir dirundercursor = ChartDrawer_.GetDirUnderCursor(panel1, e.Location);
             if (dirundercursor != null)
                 this.Text = dirundercursor.path + " - " + DSDirHelper.getrepr(dirundercursor.size);
             else
@@ -62,33 +67,36 @@ namespace DirSize
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            if (currentDirectory != null)
+            if (CurrentDirectory_ != null)
             {
-                PieChartDrawer.DrawChart(panel1, currentDirectory);
-                PieChartDrawer.DrawLegend(panel2, currentDirectory);
+                ChartDrawer_.DrawChart(panel1);
+                ChartDrawer_.DrawLegend(panel2);
             }
         }
 
         private void panel1_MouseClick(object sender, MouseEventArgs e)
         {
+            if (CurrentDirectory_ == null)
+                return;
+
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                DSDir dirundercursor = PieChartDrawer.GetDirUnderCursor(panel1, currentDirectory, e.Location);
+                DSDir dirundercursor = ChartDrawer_.GetDirUnderCursor(panel1, e.Location);
                 if (dirundercursor != null)
                 {
-                    currentDirectory = dirundercursor;
-                    PieChartDrawer.DrawChart(panel1, currentDirectory);
-                    PieChartDrawer.DrawLegend(panel2, currentDirectory);
+                    CurrentDirectory_ = dirundercursor;
+                    ChartDrawer_.DrawChart(panel1);
+                    ChartDrawer_.DrawLegend(panel2);
                 }
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                if (currentDirectory == rootDirectory)
+                if (CurrentDirectory_ == RootDirectory_)
                     return;
 
-                currentDirectory = currentDirectory.parent;
-                PieChartDrawer.DrawChart(panel1, currentDirectory);
-                PieChartDrawer.DrawLegend(panel2, currentDirectory);
+                CurrentDirectory_ = CurrentDirectory_.parent;
+                ChartDrawer_.DrawChart(panel1);
+                ChartDrawer_.DrawLegend(panel2);
             }
         }
     }
