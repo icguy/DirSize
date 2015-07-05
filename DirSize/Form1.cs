@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,9 +19,7 @@ namespace DirSize
             InitializeComponent();
         }
 
-        //TODO: grafikusan megjeleníteni pie charton a cuccot!
-        //-pie chart szeleteire klikkelve subdirbe lehessen menni
-        //-jobb klikk parent dir-be
+        //TODO:
         //-kurzor fölött tooltipben az éppen aktuális pie-rész adatai
         //-legend
 
@@ -28,21 +28,27 @@ namespace DirSize
             //string path = @"D:\Dokumentumok";
             //DSDir root = new DSDir(path);
             //System.Diagnostics.Debug.WriteLine(DDirHelper.printDDir(root));
+            button1_Click(null, null);
         }
 
         DSDir currentDirectory;
         DSDir rootDirectory;
         private void button1_Click(object sender, EventArgs e)
         {
+#if !DEBUG
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
 
             rootDirectory = new DSDir(fbd.SelectedPath);
+#else
+            rootDirectory = new DSDir("D:/Asztal/temp");
+#endif
             currentDirectory = rootDirectory;
             System.Diagnostics.Debug.WriteLine(DSDirHelper.printDSDir(currentDirectory));
 
             PieChartDrawer.DrawChart(panel1, currentDirectory);
+            PieChartDrawer.DrawLegend(panel2, currentDirectory);
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
@@ -57,7 +63,10 @@ namespace DirSize
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             if (currentDirectory != null)
+            {
                 PieChartDrawer.DrawChart(panel1, currentDirectory);
+                PieChartDrawer.DrawLegend(panel2, currentDirectory);
+            }
         }
 
         private void panel1_MouseClick(object sender, MouseEventArgs e)
@@ -69,6 +78,7 @@ namespace DirSize
                 {
                     currentDirectory = dirundercursor;
                     PieChartDrawer.DrawChart(panel1, currentDirectory);
+                    PieChartDrawer.DrawLegend(panel2, currentDirectory);
                 }
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -78,6 +88,7 @@ namespace DirSize
 
                 currentDirectory = currentDirectory.parent;
                 PieChartDrawer.DrawChart(panel1, currentDirectory);
+                PieChartDrawer.DrawLegend(panel2, currentDirectory);
             }
         }
     }

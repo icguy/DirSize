@@ -68,6 +68,7 @@ namespace DirSize
                 startAngle += sweepAngle;
             }
 
+            //files
             gfx.FillPie(new SolidBrush(FilesColor), targetRect, startAngle, 360 - startAngle);
         }
 
@@ -96,7 +97,44 @@ namespace DirSize
                     return directory.subdirs[i];
             }
             return null;
-        }        
+        }
+        
+        public static int squaresize = 15;
+        public static int halfborder = 5;
+        public static void DrawLegend(Control control, DSDir directory)
+        {
+            Graphics gfx = control.CreateGraphics();
+            int ox = 0, oy = 0; //origin
+
+            List<DSDir> subdirs = directory.subdirs;
+            subdirs.Sort(new DSDirComparer());
+
+            int lineHeight= squaresize + 2*halfborder;
+            //drawing subdirs
+            int i = 0;
+            for (; i < subdirs.Count && i < StandardColors.Length; i++)
+            {
+                DrawLegendLine(ox, oy + i * lineHeight, StandardColors[i], subdirs[i].path, gfx);
+            }
+
+            //if having "other" directories
+            for (; i < subdirs.Count; i++ )
+            {
+                DrawLegendLine(ox, oy + i * lineHeight, OtherColor, subdirs[i].path, gfx);
+            }
+
+            //files
+            DrawLegendLine(ox, oy + i * lineHeight, FilesColor, "Files", gfx);
+        }
+
+        public static int FontSize = 10;
+        static void DrawLegendLine(int ox, int oy, Color color, string text, Graphics gfx)
+        {
+            int stringOffset = FontSize / 5;
+            gfx.FillRectangle(new SolidBrush(color), new Rectangle(ox + halfborder, oy + halfborder, squaresize, squaresize));
+            gfx.DrawRectangle(new Pen(Color.Black), new Rectangle(ox + halfborder, oy + halfborder, squaresize, squaresize));
+            gfx.DrawString(text, new Font("Sergoe UI", FontSize), new SolidBrush(Color.Black), new Point(ox + halfborder * 2 + squaresize, oy + (squaresize + 2 * halfborder - FontSize) / 2 - stringOffset));
+        }
 
         public class DSDirComparer : IComparer<DSDir>
         {
