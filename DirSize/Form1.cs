@@ -1,4 +1,4 @@
-﻿#define DEBUG
+﻿//#define DEBUG_
 
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Configuration;
 
 namespace DirSize
 {
@@ -21,27 +22,40 @@ namespace DirSize
 
         //TODO:
         //-kurzor fölött tooltipben az éppen aktuális pie-rész adatai
-        //-legend
+        //-ahol a kurzor áll, azt a mappát highlightolni a pie charton és a legenden
+        //-appsettings nem működ.
+        //-a legendbe a basepath-t nem kéne kiírni
 
         private void Form1_Load(object sender, EventArgs e)
         {
             //string path = @"D:\Dokumentumok";
             //DSDir root = new DSDir(path);
             //System.Diagnostics.Debug.WriteLine(DDirHelper.printDDir(root));
+            Config_ = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         }
 
-        DSDir CurrentDirectory_;
-        DSDir RootDirectory_;
-        PieChartDrawer ChartDrawer_;
+        private DSDir CurrentDirectory_;
+        private DSDir RootDirectory_;
+        private PieChartDrawer ChartDrawer_;
+        private Configuration Config_;
 
         private void button1_Click(object sender, EventArgs e)
         {
-#if !DEBUG
+#if !DEBUG_
             FolderBrowserDialog fbd = new FolderBrowserDialog();
+
+            string initfolder = Config_.AppSettings.Settings["initialfolder"].Value;
+            if (initfolder != null)
+                fbd.SelectedPath = initfolder;
+
             if (fbd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
 
-            rootDirectory = new DSDir(fbd.SelectedPath);
+            Config_.AppSettings.Settings["initialfolder"].Value = fbd.SelectedPath;
+            Config_.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+
+            RootDirectory_ = new DSDir(fbd.SelectedPath);
 #else
             RootDirectory_ = new DSDir("D:/Asztal/temp");
 #endif
@@ -84,7 +98,7 @@ namespace DirSize
                 DSDir dirundercursor = ChartDrawer_.GetDirUnderCursor(panel1, e.Location);
                 if (dirundercursor != null)
                 {
-                    CurrentDirectory_ = dirundercursor;
+                    RefreshCurrentDir(dirundercursor);
                     ChartDrawer_.DrawChart(panel1);
                     ChartDrawer_.DrawLegend(panel2);
                 }
@@ -94,10 +108,16 @@ namespace DirSize
                 if (CurrentDirectory_ == RootDirectory_)
                     return;
 
-                CurrentDirectory_ = CurrentDirectory_.parent;
+                RefreshCurrentDir(CurrentDirectory_.parent);
                 ChartDrawer_.DrawChart(panel1);
                 ChartDrawer_.DrawLegend(panel2);
             }
+        }
+
+        private void RefreshCurrentDir(DSDir newDir)
+        {
+            CurrentDirectory_ = newDir;
+            ChartDrawer_.CurrentDirectory = CurrentDirectory_;
         }
     }
 }

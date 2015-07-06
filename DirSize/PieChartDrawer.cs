@@ -25,10 +25,10 @@ namespace DirSize
         public int HalfBorder = 5;
         public int FontSize = 10;
 
-        Dictionary<DSDir, Color> ColorMap_;
+        private Dictionary<DSDir, Color> ColorMap_;
 
-        DSDir CurrentDirectory_ = null;
-        DSDir CurrentDirectory
+        private DSDir CurrentDirectory_ = null;
+        public DSDir CurrentDirectory
         {
             get { return CurrentDirectory_; }
             set { UpdateCurrentDirectory(value); }
@@ -44,7 +44,7 @@ namespace DirSize
             UpdateCurrentDirectory(directory);
         }
 
-        void UpdateCurrentDirectory(DSDir newDir)
+        private void UpdateCurrentDirectory(DSDir newDir)
         {
             if (CurrentDirectory_ == newDir)
                 return;
@@ -54,7 +54,7 @@ namespace DirSize
             UpdateColorMap();
         }
 
-        void UpdateColorMap()
+        private void UpdateColorMap()
         {
             ColorMap_.Clear();
             List<DSDir> subdirs = CurrentDirectory_.subdirs;
@@ -151,14 +151,14 @@ namespace DirSize
             int i = 0;
             for (; i < subdirs.Count; i++)
             {
-                DrawLegendLine(ox, oy + i * lineHeight, ColorMap_[subdirs[i]], subdirs[i].path, gfx);
+                DrawLegendLine(ox, oy + i * lineHeight, ColorMap_[subdirs[i]], subdirs[i].shortpath, gfx);
             }
 
             //files
             DrawLegendLine(ox, oy + i * lineHeight, FilesColor, "Files", gfx);
         }
 
-        void DrawLegendLine(int ox, int oy, Color color, string text, Graphics gfx)
+        private void DrawLegendLine(int ox, int oy, Color color, string text, Graphics gfx)
         {
             int stringOffset = FontSize / 5;
             gfx.FillRectangle(new SolidBrush(color), new Rectangle(ox + HalfBorder, oy + HalfBorder, SquareSize, SquareSize));

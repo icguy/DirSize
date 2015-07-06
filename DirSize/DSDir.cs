@@ -67,6 +67,8 @@ namespace DirSize
     class DSDir
     {
         public string path;
+        public string basepath;
+        public string shortpath;    //basepath + shortpath = path
         public DSDir parent;
         public List<DSDir> subdirs;
         public List<DSFile> files;
@@ -79,6 +81,16 @@ namespace DirSize
             files = new List<DSFile>();
             this.path = path;
             this.parent = parent;
+            if (parent == null)
+            {
+                this.basepath = path;
+                this.shortpath = "";
+            }
+            else
+            {
+                this.basepath = parent.basepath;
+                this.shortpath = path.Substring(this.basepath.Length);
+            }
 
             string[] subdirs_list = Directory.GetDirectories(path);
             string[] files_list = Directory.GetFiles(path);
