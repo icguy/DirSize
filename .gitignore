@@ -1,2 +1,4 @@
 DirSize/bin/*
 DirSize/obj/*
+*.sln
+*.suo
