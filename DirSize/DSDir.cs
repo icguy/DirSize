@@ -66,20 +66,19 @@ namespace DirSize
 
     class DSDir
     {
-        public string path { get; set; }
-        public string basepath { get; set; }
-        public string shortpath { get; set; }    //basepath + shortpath = path
-        public DSDir parent { get; set; }
-        public List<DSDir> subdirs { get; set; }
-        public List<DSFile> files { get; set; }
-        public long size { get; set; }
+        public string path { get { return basepath + shortpath; }} //basepath + shortpath = path
+        public string basepath { get; private set; }
+        public string shortpath { get; private set; }
+        public DSDir parent { get; private set; }
+        public List<DSDir> subdirs { get; private set; }
+        public List<DSFile> files { get; private set; }
+        public long size { get; private set; }
 
         public DSDir(string path, DSDir parent = null)
         {
             System.Diagnostics.Debug.WriteLine("scanning: " + path);
             subdirs = new List<DSDir>();
             files = new List<DSFile>();
-            this.path = path;
             this.parent = parent;
             if (parent == null)
             {
