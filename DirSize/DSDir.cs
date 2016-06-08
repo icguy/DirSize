@@ -72,8 +72,10 @@ namespace DirSize
         public DSDir parent { get; private set; }
         public List<DSDir> subdirs { get; private set; }
         public List<DSFile> files { get; private set; }
-        public long size { get; private set; }
-
+        public long size { get { return FilesSize + SubdirectoriesSize; } }
+        public long FilesSize { get; private set; }
+        public long SubdirectoriesSize { get; private set; }
+        
         public DSDir(string path, DSDir parent = null)
         {
             System.Diagnostics.Debug.WriteLine("scanning: " + path);
@@ -102,14 +104,15 @@ namespace DirSize
                 this.subdirs.Add(new DSDir(sd, this));
             }
 
-            size = 0;
+            FilesSize = 0;
             foreach (var f in files)
             {
-                size += f.size;
+                FilesSize += f.size;
             }
+            SubdirectoriesSize = 0;
             foreach (var sd in subdirs)
             {
-                size += sd.size;
+                SubdirectoriesSize += sd.size;
             }
         }
     }
