@@ -214,23 +214,13 @@ namespace DirSize
             {                
                 string dir = subdir.Path.Split(new char[]{'\\', '/'}).LastOrDefault();
                 string size = DSDirHelper.SizeToString(subdir.Size);
-                var newrow = new DSDirGridRow()
-                    {
-                        LegendImage = LegendMarkers_[ColorMap_[subdir]],
-                        Path = dir,
-                        Size = size
-                    };                                
+                var newrow = new DSDirGridRow(LegendMarkers_[ColorMap_[subdir]], subdir);
                 rows.Add(newrow);
             }
 
             if (CurrentDirectory_.FilesSize > 0)
             {
-                var filesRow = new DSDirGridRow()
-                {
-                    LegendImage = LegendMarkers_[FilesColor],
-                    Path = "(files)",
-                    Size = DSDirHelper.SizeToString(CurrentDirectory_.FilesSize)
-                };
+                var filesRow = new DSDirGridRow(LegendMarkers_[FilesColor], "(files)", CurrentDirectory_.FilesSize);
                 rows.Add(filesRow);
             }
 
@@ -251,11 +241,32 @@ namespace DirSize
             grid.ClearSelection();
         }
 
-        public struct DSDirGridRow
+        public class DSDirGridRow
         {
             public Image LegendImage { get; set; }
             public string Path { get; set; }
             public string Size { get; set; }
+            
+            private DSDir Directory_;
+            public DSDir GetDirectory()
+            {
+                return Directory_;
+            }
+
+            public DSDirGridRow(Bitmap img, DSDir dir)
+            {
+                LegendImage = img;
+                Path = dir.Path.Split(new char[]{'\\', '/'}).LastOrDefault();
+                Size = DSDirHelper.SizeToString(dir.Size);
+                Directory_ = dir;
+            }
+            public DSDirGridRow(Bitmap img, string path, long size)
+            {
+                LegendImage = img;
+                Path = path;
+                Size = DSDirHelper.SizeToString(size);
+                Directory_ = null;
+            }
         }
 
         public class DSDirComparer : IComparer<DSDir>
