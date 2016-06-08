@@ -30,7 +30,7 @@ namespace DirSize
             //string path = @"D:\Dokumentumok";
             //DSDir root = new DSDir(path);
             //System.Diagnostics.Debug.WriteLine(DDirHelper.printDDir(root));
-            Config_ = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            Config_ = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);                        
         }
 
         private DSDir CurrentDirectory_;
@@ -63,7 +63,7 @@ namespace DirSize
             System.Diagnostics.Debug.WriteLine(DSDirHelper.PrintDSDir(CurrentDirectory_));
 
             ChartDrawer_.DrawChart(panel1);
-            ChartDrawer_.DrawLegend(panel2);
+            ChartDrawer_.DrawLegend(dataGridView1);
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
@@ -83,7 +83,7 @@ namespace DirSize
             if (CurrentDirectory_ != null)
             {
                 ChartDrawer_.DrawChart(panel1);
-                ChartDrawer_.DrawLegend(panel2);
+                ChartDrawer_.DrawLegend(dataGridView1);
             }
         }
 
@@ -99,7 +99,7 @@ namespace DirSize
                 {
                     RefreshCurrentDir(dirundercursor);
                     ChartDrawer_.DrawChart(panel1);
-                    ChartDrawer_.DrawLegend(panel2);
+                    ChartDrawer_.DrawLegend(dataGridView1);
                 }
             }
             else if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -109,7 +109,7 @@ namespace DirSize
 
                 RefreshCurrentDir(CurrentDirectory_.Parent);
                 ChartDrawer_.DrawChart(panel1);
-                ChartDrawer_.DrawLegend(panel2);
+                ChartDrawer_.DrawLegend(dataGridView1);
             }
         }
 
@@ -117,6 +117,16 @@ namespace DirSize
         {
             CurrentDirectory_ = newDir;
             ChartDrawer_.CurrentDirectory = CurrentDirectory_;
+        }
+
+        private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            //TODO open folder
+        }
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            dataGridView1.ClearSelection();
         }
     }
 }

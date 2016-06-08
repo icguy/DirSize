@@ -12,9 +12,38 @@ namespace DirSize
     class PieChartDrawer
     {
         //colors
-        public Color[] StandardColors { get; set; }
-        public Color OtherColor { get; set; }
-        public Color FilesColor { get; set; }
+        private Color[] StandardColors_;
+        public Color[] StandardColors
+        {
+            get { return StandardColors_; }
+            set
+            {
+                StandardColors_ = value;
+                UpdateLegendMarkers();
+            }
+        }
+
+        private Color OtherColor_;
+        public Color OtherColor
+        {
+            get { return OtherColor_; }
+            set
+            {
+                OtherColor_ = value;
+                UpdateLegendMarkers();
+            }
+        }
+
+        private Color FilesColor_;
+        public Color FilesColor
+        {
+            get { return FilesColor_; }
+            set
+            {
+                FilesColor_ = value;
+                UpdateLegendMarkers();
+            }
+        }
 
         //pie chart dimensions
         public int ChartBorder { get; set; }
@@ -22,10 +51,18 @@ namespace DirSize
         public float ChartSizeRatio { get; set; }
 
         //legend dimensions
-        public int SquareSize { get; set; }
-        public int HalfBorder { get; set; }
-        public int FontSize { get; set; }
-
+        private int SquareSize_;
+        public int SquareSize
+        {
+            get { return SquareSize_; }
+            set
+            {
+                SquareSize_ = value;
+                UpdateLegendMarkers();
+            }
+        }
+        
+        private Dictionary<Color, Bitmap> LegendMarkers_;
         private Dictionary<DSDir, Color> ColorMap_;
 
         private DSDir CurrentDirectory_ = null;
@@ -49,15 +86,29 @@ namespace DirSize
 
             //legend dimensions
             SquareSize = 15;
-            HalfBorder = 5;
-            FontSize = 10;
 
             if (directory == null)
                 throw new ArgumentNullException();
 
-            this.ColorMap_ = new Dictionary<DSDir, Color>();
+            ColorMap_ = new Dictionary<DSDir, Color>();
 
             UpdateCurrentDirectory(directory);
+        }
+
+        private void UpdateLegendMarkers()
+        {
+            if (SquareSize <= 0)
+                return;
+
+            LegendMarkers_ = new Dictionary<Color, Bitmap>();
+            foreach (var color in StandardColors.Concat(new List<Color>() { OtherColor, FilesColor }))
+            {
+                Bitmap bmp = new Bitmap(SquareSize, SquareSize);
+                Graphics gfx = Graphics.FromImage(bmp);
+                gfx.FillRectangle(new SolidBrush(color), new Rectangle(0, 0, SquareSize, SquareSize));
+                gfx.DrawRectangle(new Pen(Color.Black), new Rectangle(0, 0, SquareSize, SquareSize));
+                LegendMarkers_[color] = bmp;
+            }
         }
 
         private void UpdateCurrentDirectory(DSDir newDir)
@@ -153,34 +204,58 @@ namespace DirSize
             return null;
         }
 
-        public void DrawLegend(Control control)
+        public void DrawLegend(DataGridView grid)
         {
-            Graphics gfx = control.CreateGraphics();
-            gfx.Clear(control.BackColor);
-            
-            int ox = 0, oy = 0; //origin
+            grid.Rows.Clear();
 
             List<DSDir> subdirs = CurrentDirectory_.Subdirs;
-
-            int lineHeight = SquareSize + 2 * HalfBorder;
-            //drawing subdirs
-            int i = 0;
-            for (; i < subdirs.Count; i++)
-            {
-                string dir = subdirs[i].Path.Split(new char[]{'\\', '/'}).LastOrDefault() + " " + DSDirHelper.SizeToString(subdirs[i].Size);
-                DrawLegendLine(ox, oy + i * lineHeight, ColorMap_[subdirs[i]], dir, gfx);
+            List<DSDirGridRow> rows = new List<DSDirGridRow>();
+            foreach (var subdir in subdirs)
+            {                
+                string dir = subdir.Path.Split(new char[]{'\\', '/'}).LastOrDefault();
+                string size = DSDirHelper.SizeToString(subdir.Size);
+                var newrow = new DSDirGridRow()
+                    {
+                        LegendImage = LegendMarkers_[ColorMap_[subdir]],
+                        Path = dir,
+                        Size = size
+                    };                                
+                rows.Add(newrow);
             }
 
-            //files
-            DrawLegendLine(ox, oy + i * lineHeight, FilesColor, "Files " + DSDirHelper.SizeToString(CurrentDirectory_.FilesSize), gfx);
+            if (CurrentDirectory_.FilesSize > 0)
+            {
+                var filesRow = new DSDirGridRow()
+                {
+                    LegendImage = LegendMarkers_[FilesColor],
+                    Path = "(files)",
+                    Size = DSDirHelper.SizeToString(CurrentDirectory_.FilesSize)
+                };
+                rows.Add(filesRow);
+            }
+
+            var source = new BindingSource();
+            source.DataSource = rows;
+            grid.DataSource = source;
+
+            grid.AutoResizeColumns();
+            foreach (DataGridViewRow row in grid.Rows)
+            {                
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    cell.Style.BackColor = SystemColors.Control;
+                }
+            }
+
+
+            grid.ClearSelection();
         }
 
-        private void DrawLegendLine(int ox, int oy, Color color, string text, Graphics gfx)
+        public struct DSDirGridRow
         {
-            int stringOffset = FontSize / 5;
-            gfx.FillRectangle(new SolidBrush(color), new Rectangle(ox + HalfBorder, oy + HalfBorder, SquareSize, SquareSize));
-            gfx.DrawRectangle(new Pen(Color.Black), new Rectangle(ox + HalfBorder, oy + HalfBorder, SquareSize, SquareSize));
-            gfx.DrawString(text, new Font("Sergoe UI", FontSize), new SolidBrush(Color.Black), new Point(ox + HalfBorder * 2 + SquareSize, oy + (SquareSize + 2 * HalfBorder - FontSize) / 2 - stringOffset));
+            public Image LegendImage { get; set; }
+            public string Path { get; set; }
+            public string Size { get; set; }
         }
 
         public class DSDirComparer : IComparer<DSDir>
