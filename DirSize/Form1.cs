@@ -10,6 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace DirSize
 {
@@ -24,6 +25,7 @@ namespace DirSize
         //-kurzor fölött tooltipben az éppen aktuális pie-rész adatai
         //-ahol a kurzor áll, azt a mappát highlightolni a pie charton és a legenden
         //-appsettings nem működ.
+        //-duplakattra az adott dir-be vigyen
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -92,24 +94,17 @@ namespace DirSize
             if (CurrentDirectory_ == null)
                 return;
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 DSDir dirundercursor = ChartDrawer_.GetDirUnderCursor(panel1, e.Location);
                 if (dirundercursor != null)
                 {
-                    RefreshCurrentDir(dirundercursor);
-                    ChartDrawer_.DrawChart(panel1);
-                    ChartDrawer_.DrawLegend(dataGridView1);
+                    NavigateDown(dirundercursor);
                 }
             }
-            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            else if (e.Button == MouseButtons.Right)
             {
-                if (CurrentDirectory_ == RootDirectory_)
-                    return;
-
-                RefreshCurrentDir(CurrentDirectory_.Parent);
-                ChartDrawer_.DrawChart(panel1);
-                ChartDrawer_.DrawLegend(dataGridView1);
+                NavigateUp();
             }
         }
 
@@ -121,12 +116,51 @@ namespace DirSize
 
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            //TODO open folder
+            if (e.Button != MouseButtons.Left)
+                return;
+
+            var rowItem = dataGridView1.Rows[e.RowIndex].DataBoundItem as PieChartDrawer.DSDirGridRow;
+            if (rowItem != null)
+                OpenFolder(rowItem.GetDirectory());
+        }
+
+        private void OpenFolder(DSDir dir)
+        {
+            if (dir == null)
+                return;
+            if (!Directory.Exists(dir.Path))
+                return;
+
+            try
+            {
+                Process.Start(dir.Path);
+            }
+            catch (Exception)
+            { 
+            
+            }
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
         {
             dataGridView1.ClearSelection();
         }
+
+        private void NavigateDown(DSDir directory)
+        {
+            RefreshCurrentDir(directory);
+            ChartDrawer_.DrawChart(panel1);
+            ChartDrawer_.DrawLegend(dataGridView1);
+        }
+
+        private void NavigateUp()
+        {
+            if (CurrentDirectory_ == RootDirectory_)
+                return;
+
+            RefreshCurrentDir(CurrentDirectory_.Parent);
+            ChartDrawer_.DrawChart(panel1);
+            ChartDrawer_.DrawLegend(dataGridView1);
+        } 
     }
 }
