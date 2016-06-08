@@ -22,7 +22,7 @@ namespace DirSize
         static List<string> printDDir_inner(DSDir dir)
         {
             List<string> retval = new List<string>();
-            retval.Add("<folder " + dir.path + " - " + getrepr(dir.size)+ ">");
+            retval.Add("<folder " + dir.path + " - " + sizeToString(dir.size)+ ">");
             foreach (var d in dir.subdirs)
             {
                 List<string> dlist = printDDir_inner(d);
@@ -35,7 +35,7 @@ namespace DirSize
             return retval;
         }
 
-        public static string getrepr(long size)
+        public static string sizeToString(long size)
         {
             double sz = size;
             int order = 0;

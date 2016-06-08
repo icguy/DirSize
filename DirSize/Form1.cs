@@ -73,7 +73,7 @@ namespace DirSize
 
             DSDir dirundercursor = ChartDrawer_.GetDirUnderCursor(panel1, e.Location);
             if (dirundercursor != null)
-                this.Text = dirundercursor.path + " - " + DSDirHelper.getrepr(dirundercursor.size);
+                this.Text = dirundercursor.path + " - " + DSDirHelper.sizeToString(dirundercursor.size);
             else
                 this.Text = "";
         }
