@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using System.IO;
 
 namespace DirSize
 {
@@ -151,7 +152,8 @@ namespace DirSize
             int i = 0;
             for (; i < subdirs.Count; i++)
             {
-                DrawLegendLine(ox, oy + i * lineHeight, ColorMap_[subdirs[i]], subdirs[i].shortpath, gfx);
+                string dir = subdirs[i].path.Split(new char[]{'\\', '/'}).LastOrDefault();
+                DrawLegendLine(ox, oy + i * lineHeight, ColorMap_[subdirs[i]], dir, gfx);
             }
 
             //files
