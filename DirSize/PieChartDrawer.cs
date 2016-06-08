@@ -172,7 +172,7 @@ namespace DirSize
             }
 
             //files
-            DrawLegendLine(ox, oy + i * lineHeight, FilesColor, "Files", gfx);
+            DrawLegendLine(ox, oy + i * lineHeight, FilesColor, "Files " + DSDirHelper.SizeToString(CurrentDirectory_.FilesSize), gfx);
         }
 
         private void DrawLegendLine(int ox, int oy, Color color, string text, Graphics gfx)
