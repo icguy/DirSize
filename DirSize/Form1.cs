@@ -73,7 +73,7 @@ namespace DirSize
 
             DSDir dirundercursor = ChartDrawer_.GetDirUnderCursor(panel1, e.Location);
             if (dirundercursor != null)
-                this.Text = dirundercursor.path + " - " + DSDirHelper.SizeToString(dirundercursor.size);
+                this.Text = dirundercursor.Path + " - " + DSDirHelper.SizeToString(dirundercursor.Size);
             else
                 this.Text = "";
         }
@@ -107,7 +107,7 @@ namespace DirSize
                 if (CurrentDirectory_ == RootDirectory_)
                     return;
 
-                RefreshCurrentDir(CurrentDirectory_.parent);
+                RefreshCurrentDir(CurrentDirectory_.Parent);
                 ChartDrawer_.DrawChart(panel1);
                 ChartDrawer_.DrawLegend(panel2);
             }

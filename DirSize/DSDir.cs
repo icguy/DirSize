@@ -22,8 +22,8 @@ namespace DirSize
         static List<string> PrintDDir_inner(DSDir dir)
         {
             List<string> retval = new List<string>();
-            retval.Add("<folder " + dir.path + " - " + SizeToString(dir.size)+ ">");
-            foreach (var d in dir.subdirs)
+            retval.Add("<folder " + dir.Path + " - " + SizeToString(dir.Size)+ ">");
+            foreach (var d in dir.Subdirs)
             {
                 List<string> dlist = PrintDDir_inner(d);
                 foreach (var line in dlist)
@@ -66,53 +66,53 @@ namespace DirSize
 
     class DSDir
     {
-        public string path { get { return basepath + shortpath; }} //basepath + shortpath = path
-        public string basepath { get; private set; }
-        public string shortpath { get; private set; }
-        public DSDir parent { get; private set; }
-        public List<DSDir> subdirs { get; private set; }
-        public List<DSFile> files { get; private set; }
-        public long size { get { return FilesSize + SubdirectoriesSize; } }
+        public string Path { get { return Basepath + Shortpath; }} //basepath + shortpath = path
+        public string Basepath { get; private set; }
+        public string Shortpath { get; private set; }
+        public DSDir Parent { get; private set; }
+        public List<DSDir> Subdirs { get; private set; }
+        public List<DSFile> Files { get; private set; }
+        public long Size { get { return FilesSize + SubdirectoriesSize; } }
         public long FilesSize { get; private set; }
         public long SubdirectoriesSize { get; private set; }
         
         public DSDir(string path, DSDir parent = null)
         {
             System.Diagnostics.Debug.WriteLine("scanning: " + path);
-            subdirs = new List<DSDir>();
-            files = new List<DSFile>();
-            this.parent = parent;
+            Subdirs = new List<DSDir>();
+            Files = new List<DSFile>();
+            this.Parent = parent;
             if (parent == null)
             {
-                this.basepath = path;
-                this.shortpath = "";
+                this.Basepath = path;
+                this.Shortpath = "";
             }
             else
             {
-                this.basepath = parent.basepath;
-                this.shortpath = path.Substring(this.basepath.Length);
+                this.Basepath = parent.Basepath;
+                this.Shortpath = path.Substring(this.Basepath.Length);
             }
 
             string[] subdirs_list = Directory.GetDirectories(path);
             string[] files_list = Directory.GetFiles(path);
             foreach (var f in files_list)
             {
-                this.files.Add(new DSFile(f));
+                this.Files.Add(new DSFile(f));
             }
             foreach (var sd in subdirs_list)
             {
-                this.subdirs.Add(new DSDir(sd, this));
+                this.Subdirs.Add(new DSDir(sd, this));
             }
 
             FilesSize = 0;
-            foreach (var f in files)
+            foreach (var f in Files)
             {
                 FilesSize += f.size;
             }
             SubdirectoriesSize = 0;
-            foreach (var sd in subdirs)
+            foreach (var sd in Subdirs)
             {
-                SubdirectoriesSize += sd.size;
+                SubdirectoriesSize += sd.Size;
             }
         }
     }

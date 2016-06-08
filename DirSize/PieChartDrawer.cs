@@ -66,14 +66,14 @@ namespace DirSize
                 return;
 
             CurrentDirectory_ = newDir;
-            CurrentDirectory_.subdirs.Sort(new DSDirComparer());
+            CurrentDirectory_.Subdirs.Sort(new DSDirComparer());
             UpdateColorMap();
         }
 
         private void UpdateColorMap()
         {
             ColorMap_.Clear();
-            List<DSDir> subdirs = CurrentDirectory_.subdirs;
+            List<DSDir> subdirs = CurrentDirectory_.Subdirs;
             for (int i = 0; i < subdirs.Count; i++)
             {
                 if (i < StandardColors.Length)
@@ -92,13 +92,13 @@ namespace DirSize
             int x = control.Width / 2, y = control.Height / 2;
 
             //sizes to be drawn
-            List<DSDir> subdirs = CurrentDirectory_.subdirs;
+            List<DSDir> subdirs = CurrentDirectory_.Subdirs;
             long allSubdirsSize = 0;
             foreach (DSDir subdir in subdirs)
             {
-                allSubdirsSize += subdir.size;
+                allSubdirsSize += subdir.Size;
             }
-            long filesSize = CurrentDirectory_.size - allSubdirsSize;
+            long filesSize = CurrentDirectory_.Size - allSubdirsSize;
 
             //drawing background
             gfx.FillRectangle(
@@ -117,7 +117,7 @@ namespace DirSize
             float startAngle = 0;
             for (int i = 0; i < subdirs.Count; i++)
             {
-                float sweepAngle = 360f * subdirs[i].size / CurrentDirectory_.size;
+                float sweepAngle = 360f * subdirs[i].Size / CurrentDirectory_.Size;
                 gfx.FillPie(new SolidBrush(ColorMap_[subdirs[i]]), targetRect, startAngle, sweepAngle);
                 startAngle += sweepAngle;
             }
@@ -128,7 +128,7 @@ namespace DirSize
 
         public DSDir GetDirUnderCursor(Control control, Point location)
         {
-            if (CurrentDirectory_.subdirs.Count == 0)
+            if (CurrentDirectory_.Subdirs.Count == 0)
                 return null;
 
             int cx = control.Width / 2, cy = control.Height / 2;
@@ -144,11 +144,11 @@ namespace DirSize
 
             double ratio = phi / (Math.PI * 2);
             long start = 0;
-            for (int i = 0; i < CurrentDirectory_.subdirs.Count; i++)
+            for (int i = 0; i < CurrentDirectory_.Subdirs.Count; i++)
             {
-                start += CurrentDirectory_.subdirs[i].size;
-                if (1.0 * start / CurrentDirectory_.size > ratio)
-                    return CurrentDirectory_.subdirs[i];
+                start += CurrentDirectory_.Subdirs[i].Size;
+                if (1.0 * start / CurrentDirectory_.Size > ratio)
+                    return CurrentDirectory_.Subdirs[i];
             }
             return null;
         }
@@ -160,14 +160,14 @@ namespace DirSize
             
             int ox = 0, oy = 0; //origin
 
-            List<DSDir> subdirs = CurrentDirectory_.subdirs;
+            List<DSDir> subdirs = CurrentDirectory_.Subdirs;
 
             int lineHeight = SquareSize + 2 * HalfBorder;
             //drawing subdirs
             int i = 0;
             for (; i < subdirs.Count; i++)
             {
-                string dir = subdirs[i].path.Split(new char[]{'\\', '/'}).LastOrDefault() + " " + DSDirHelper.SizeToString(subdirs[i].size);
+                string dir = subdirs[i].Path.Split(new char[]{'\\', '/'}).LastOrDefault() + " " + DSDirHelper.SizeToString(subdirs[i].Size);
                 DrawLegendLine(ox, oy + i * lineHeight, ColorMap_[subdirs[i]], dir, gfx);
             }
 
@@ -193,7 +193,7 @@ namespace DirSize
 
             public int Compare(DSDir x, DSDir y)
             {
-                long d = x.size - y.size;
+                long d = x.Size - y.Size;
                 if (Ascending)
                     return Math.Sign(d);
                 return -Math.Sign(d);
