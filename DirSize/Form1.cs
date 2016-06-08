@@ -24,7 +24,6 @@ namespace DirSize
         //-kurzor fölött tooltipben az éppen aktuális pie-rész adatai
         //-ahol a kurzor áll, azt a mappát highlightolni a pie charton és a legenden
         //-appsettings nem működ.
-        //-a legendbe a basepath-t nem kéne kiírni
 
         private void Form1_Load(object sender, EventArgs e)
         {
