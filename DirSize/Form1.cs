@@ -60,7 +60,7 @@ namespace DirSize
 #endif
             ChartDrawer_ = new PieChartDrawer(RootDirectory_);
             CurrentDirectory_ = RootDirectory_;
-            System.Diagnostics.Debug.WriteLine(DSDirHelper.printDSDir(CurrentDirectory_));
+            System.Diagnostics.Debug.WriteLine(DSDirHelper.PrintDSDir(CurrentDirectory_));
 
             ChartDrawer_.DrawChart(panel1);
             ChartDrawer_.DrawLegend(panel2);
@@ -73,7 +73,7 @@ namespace DirSize
 
             DSDir dirundercursor = ChartDrawer_.GetDirUnderCursor(panel1, e.Location);
             if (dirundercursor != null)
-                this.Text = dirundercursor.path + " - " + DSDirHelper.sizeToString(dirundercursor.size);
+                this.Text = dirundercursor.path + " - " + DSDirHelper.SizeToString(dirundercursor.size);
             else
                 this.Text = "";
         }

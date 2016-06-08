@@ -6,10 +6,10 @@ namespace DirSize
 {
     static class DSDirHelper
     {
-        static public string printDSDir(DSDir dir)
+        static public string PrintDSDir(DSDir dir)
         {
             string outstr = "";
-            List<string> print_inner = printDDir_inner(dir);
+            List<string> print_inner = PrintDDir_inner(dir);
             foreach (var line in print_inner)
             {
                 outstr = outstr + line + "\n";
@@ -17,25 +17,25 @@ namespace DirSize
             return outstr;
         }
 
-        const string delim = "\t";
+        public const string Delim = "\t";
 
-        static List<string> printDDir_inner(DSDir dir)
+        static List<string> PrintDDir_inner(DSDir dir)
         {
             List<string> retval = new List<string>();
-            retval.Add("<folder " + dir.path + " - " + sizeToString(dir.size)+ ">");
+            retval.Add("<folder " + dir.path + " - " + SizeToString(dir.size)+ ">");
             foreach (var d in dir.subdirs)
             {
-                List<string> dlist = printDDir_inner(d);
+                List<string> dlist = PrintDDir_inner(d);
                 foreach (var line in dlist)
                 {
-                    retval.Add(delim + line);
+                    retval.Add(Delim + line);
                 }
             }
             retval.Add("</folder>");
             return retval;
         }
 
-        public static string sizeToString(long size)
+        public static string SizeToString(long size)
         {
             double sz = size;
             int order = 0;

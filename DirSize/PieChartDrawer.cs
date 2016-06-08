@@ -167,7 +167,7 @@ namespace DirSize
             int i = 0;
             for (; i < subdirs.Count; i++)
             {
-                string dir = subdirs[i].path.Split(new char[]{'\\', '/'}).LastOrDefault();
+                string dir = subdirs[i].path.Split(new char[]{'\\', '/'}).LastOrDefault() + " " + DSDirHelper.SizeToString(subdirs[i].size);
                 DrawLegendLine(ox, oy + i * lineHeight, ColorMap_[subdirs[i]], dir, gfx);
             }
 
