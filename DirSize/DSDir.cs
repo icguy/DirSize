@@ -66,13 +66,13 @@ namespace DirSize
 
     class DSDir
     {
-        public string path;
-        public string basepath;
-        public string shortpath;    //basepath + shortpath = path
-        public DSDir parent;
-        public List<DSDir> subdirs;
-        public List<DSFile> files;
-        public long size;
+        public string path { get; set; }
+        public string basepath { get; set; }
+        public string shortpath { get; set; }    //basepath + shortpath = path
+        public DSDir parent { get; set; }
+        public List<DSDir> subdirs { get; set; }
+        public List<DSFile> files { get; set; }
+        public long size { get; set; }
 
         public DSDir(string path, DSDir parent = null)
         {
