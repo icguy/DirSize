@@ -12,19 +12,19 @@ namespace DirSize
     class PieChartDrawer
     {
         //colors
-        public Color[] StandardColors = { Color.Red, Color.Green, Color.Blue, Color.Purple, Color.Cyan, Color.Yellow };
-        public Color OtherColor = Color.Black;
-        public Color FilesColor = Color.Gray;
+        public Color[] StandardColors { get; set; }
+        public Color OtherColor { get; set; }
+        public Color FilesColor { get; set; }
 
         //pie chart dimensions
-        public int ChartBorder = 5;
-        public Color ChartBorderColor = Color.LightGray;
-        public float ChartSizeRatio = 0.8f;
+        public int ChartBorder { get; set; }
+        public Color ChartBorderColor { get; set; }
+        public float ChartSizeRatio { get; set; }
 
         //legend dimensions
-        public int SquareSize = 15;
-        public int HalfBorder = 5;
-        public int FontSize = 10;
+        public int SquareSize { get; set; }
+        public int HalfBorder { get; set; }
+        public int FontSize { get; set; }
 
         private Dictionary<DSDir, Color> ColorMap_;
 
@@ -37,6 +37,21 @@ namespace DirSize
 
         public PieChartDrawer(DSDir directory)
         {
+            //colors
+            StandardColors = new Color[] { Color.Red, Color.Green, Color.Blue, Color.Purple, Color.Cyan, Color.Yellow };
+            OtherColor = Color.Black;
+            FilesColor = Color.Gray;
+
+            //pie chart dimensions
+            ChartBorder = 5;
+            ChartBorderColor = Color.LightGray;
+            ChartSizeRatio = 0.8f;
+
+            //legend dimensions
+            SquareSize = 15;
+            HalfBorder = 5;
+            FontSize = 10;
+
             if (directory == null)
                 throw new ArgumentNullException();
 
